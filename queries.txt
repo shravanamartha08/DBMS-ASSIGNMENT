@@ -1,0 +1,126 @@
+create table user(
+user_id int primary key,
+user_name varchar(10) not null,
+fname varchar(10),
+lname varchar(10),
+dob date,
+nationality varchar(10) default 'India',
+gender varchar(10),
+age int check (age>18),
+phone varchar(10),
+email varchar(30) unique,
+password varchar(8));
+
+
+create table friend(
+friend_id int,
+user_id int,
+primary key(friend_id, user_id),
+foreign key (user_id) references user(user_id) on delete cascade);
+
+
+create table posts(
+post_id int primary key,
+posted_uid int,
+posted_content vachar(100),
+post_date date,
+foreign key(posted_uid) references user(user_id) on delete cascade);
+
+
+create table comments(
+comment_id int primary key,
+post_id int,
+commented_uid int,
+commented_content varchar(100),
+foreign key (commented_uid) references user(user_id));
+
+
+create table pages(
+page_id int primary key,
+page_name varchar(10),
+page_content varchar(100));
+
+
+create table page_like(
+user_id int,
+page_id int,
+primary key(user_id, page_id),
+foreign key (user_id) references user(user_id) on delete cascade,
+foreign key (page_id) references pages(page_id) on delete cascade);
+
+
+insert into user values(1011 ,'rockey','Rakesh','Kumar','17-jan-2002','India','Male',20,'8727301872','rakeshk@gmail.com','rockey@2002');
+insert into user values(2876 ,'sandey','Sandeep','Kumar','25-jun-2003','India','Male',19,'9019723891','sandeep@gmail.com','sandeeep@251');
+insert into user values(1767 ,'ramya','Ramya','ramesh','02-apr-2000','India','Female',22,'7283912764','ramya2000@gmail.com','rramya@2000');
+insert into user values(1553,'jimmy','James','Anderson','13-mar-1986','England','Male',36,'8298312319','jamesjimmy@gmail.com','jimmy@1336');
+insert into user values(3227 ,'kate','Kate','Cross','26-may-1996','USA','Female',26,'7323198727','katecross@gmail.com','katecross$9619');
+
+
+insert into friend values(2876,1011);
+insert into friend values(1011,2876);
+insert into friend values(5723,1767);
+insert into friend values(1723,1553);
+insert into friend values(2113,3227);
+
+
+insert into posts values(123,1553,'Image','28-dec-2018');
+insert into posts values(029,2876,'Video','16-nov-2016');
+insert into posts values(312,3227,'Audio','09-aug-2020');
+insert into posts values(399,1767,'Image','19-jan-2021');
+insert into posts values(417,1011,'Video','20-jun-2021');
+
+insert into comments values(177,123,1732,'Sticker');
+insert into comments values(526,312,2113,'Text');
+insert into comments values(612,417,2876,'GIF');
+insert into comments values(712,029,1011,'Text');
+insert into comments values(667,399,5723,'Emoji');
+
+insert into pages values(1473,'Cricinfo','Video');
+insert into pages values(1317,'Stunning cars','Image');
+insert into pages values(1229,'Trade Champs','Text');
+insert into pages values(1732,'Natural vibes','Image');
+insert into pages values(1627,'Gaanaforall','Audio');
+
+insert into page_like values(2876,1317);
+insert into page_like values(1011,1229);
+insert into page_like values(1767,1627);
+insert into page_like values(3227,1732);
+insert into page_like values(1553,1473);
+
+
+Queries:
+
+1. Retreive the details of users who has nationality other than India.
+
+select * from user 
+where nationality != India;
+
+2.Retreive the details of users whose age is between 18 and 25.
+
+select *  from user
+where age between 18 and 25;
+
+3.Retreive the details of users who commented on post where post content is IMAGE.
+
+select u.* 
+from user u,posts p,comments c
+where c.commented_uid=u.user_id and
+c.post_id=p.post_id and
+p.post_content='Image';
+
+4.Reterive the post date of sandeep that he recently posted.
+
+select top1 p.post_date
+from posts p, user u
+where p.posted_uid=u.user_id and
+u.user_name='sandey'
+order by [post_date] desc;
+
+5.create an stored procedure to check that user's date of birth lies between 1-jan-1900 to 31-dec-2005
+
+create procedure dob_check as
+begin
+check(select * from user
+where dob between 01-jan-1990
+and 31-dec-2005)
+end;
